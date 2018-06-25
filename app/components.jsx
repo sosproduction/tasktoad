@@ -120,6 +120,18 @@ export class AddProject extends PureComponent {
             });
         };
 
+        const onProjectCreate = () => {
+            props.onProjectCreate({
+                text: textRef.value
+            });
+        };
+
+        const onProjectDelete = () => {
+            props.onProjectDelete({
+                text: textRef.value
+            });
+        };
+
          return (
             <div>
                 <div className="form-group">
@@ -138,8 +150,8 @@ export class AddProject extends PureComponent {
 
 AddProject.propTypes = {
     onSubmit: PropTypes.func.isRequired,
-    onProjectCreate: Proptypes.func.isRequired,
-    onProjectDelete: Proptypes.func.isRequired
+    onProjectCreate: PropTypes.func.isRequired,
+    onProjectDelete: PropTypes.func.isRequired
 };
 
 
