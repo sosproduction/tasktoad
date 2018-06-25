@@ -8,17 +8,17 @@ export default function bootstrap(schema) {
 
     // Model classes are available as properties of the
     // Session instance.
-    const { Todo, Tag, User } = session;
+    const { Task, Tag, Project } = session;
 
     // Start by creating entities whose props are not dependent
     // on others.
-    const user = User.create({
+    const project = Project.create({
         id: 0, // optional. If omitted, Redux-ORM uses a number sequence starting from 0.
-        name: 'Tommi',
+        name: 'Project 1',
     });
-    const otherUser = User.create({
+    const otherProject = Project.create({
         id: 1, // optional.
-        name: 'John',
+        name: 'Project 2',
     });
 
     // Tags to start with.
@@ -27,43 +27,43 @@ export default function bootstrap(schema) {
     const urgent = Tag.create({ name: 'urgent' });
     const chore = Tag.create({ name: 'chore' });
 
-    // Todo's for `user`
-    Todo.create({
+    // Tasks for `project`
+    Task.create({
         text: 'Buy groceries',
-        user,
+        project,
         tags: [personal], // We could also pass ids instead of the Tag instances.
     });
-    Todo.create({
+    Task.create({
         text: 'Attend meeting',
-        user,
+        project,
         tags: [work],
     });
-    Todo.create({
+    Task.create({
         text: 'Pay bills',
-        user,
+        project,
         tags: [personal, urgent],
     });
 
-    // Todo's for `otherUser`
-    Todo.create({
+    // Tasks for `otherProject`
+    Task.create({
         text: 'Prepare meals for the week',
-        user: otherUser,
+        project: otherProject,
         tags: [personal, chore],
     });
-    Todo.create({
+    Task.create({
         text: 'Fix the washing machine',
-        user: otherUser,
+        project: otherProject,
         tags: [personal, chore],
     });
-    Todo.create({
+    Task.create({
         text: 'Negotiate internet subscription',
-        user: otherUser,
+        project: otherProject,
         tags: [personal, urgent],
     });
 
     // Return the whole Redux initial state.
     return {
         orm: state,
-        selectedUserId: 0,
+        selectedProjectId: 0,
     };
 }

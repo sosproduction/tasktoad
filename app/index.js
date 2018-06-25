@@ -4,13 +4,13 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import createLogger from 'redux-logger';
 import { schema } from './models';
-import { selectedUserIdReducer } from './reducers';
+import { selectedProjectIdReducer } from './reducers';
 import bootstrap from './bootstrap';
 import App from './app';
 
 const rootReducer = combineReducers({
     orm: schema.reducer(),
-    selectedUserId: selectedUserIdReducer,
+    selectedProjectId: selectedProjectIdReducer,
 });
 
 // We're using `redux-logger`. Open up the console in the demo and you can inspect

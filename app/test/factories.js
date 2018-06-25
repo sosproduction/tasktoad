@@ -1,5 +1,5 @@
 import _factory from 'factory-girl';
-import { Todo, User, Tag } from '../models';
+import { Task, Project, Tag } from '../models';
 import bluebird from 'bluebird';
 import { ReduxORMAdapter } from './utils';
 
@@ -8,17 +8,17 @@ import { ReduxORMAdapter } from './utils';
 // We promisify factory-girl so we can use Promises instead of callbacks.
 const factory = _factory.promisify(bluebird);
 
-factory.define('Todo', 'Todo', {
+factory.define('Task', 'Task', {
     id: factory.sequence(n => n),
-    text: factory.sequence(n => `Todo ${n}`),
-    user: factory.assoc('User', 'id'),
-    tags: factory.assocMany('Tag', 'name', 4), // 4 tags for each Todo
+    text: factory.sequence(n => `Task ${n}`),
+    project: factory.assoc('Project', 'id'),
+    tags: factory.assocMany('Tag', 'name', 4), // 4 tags for each Task
     done: factory.sequence(n => n % 2 ? true : false),
 });
 
-factory.define('User', 'User', {
+factory.define('Project', 'Project', {
     id: factory.sequence(n => n),
-    name: factory.sequence(n => `User ${n}`),
+    name: factory.sequence(n => `Project ${n}`),
 });
 
 factory.define('Tag', 'Tag', {

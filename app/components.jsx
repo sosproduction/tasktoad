@@ -50,7 +50,7 @@ TextSubmitter.propTypes = {
     onSubmit: PropTypes.func.isRequired,
 };
 
-export class TodoItem extends PureComponent {
+export class TaskItem extends PureComponent {
     render() {
         const props = this.props;
         const tags = props.tags.map(tagName => {
@@ -97,7 +97,7 @@ export class TodoItem extends PureComponent {
     }
 }
 
-TodoItem.propTypes = {
+TaskItem.propTypes = {
     children: PropTypes.string.isRequired,
     tags: PropTypes.arrayOf(PropTypes.string).isRequired,
     done: PropTypes.bool.isRequired,
@@ -107,7 +107,43 @@ TodoItem.propTypes = {
     onDelete: PropTypes.func.isRequired,
 };
 
-export class AddTodoForm extends PureComponent {
+
+// add new projects
+export class AddProject extends PureComponent {
+    render() {
+        const props = this.props;
+        let textRef;
+
+        const onSubmit = () => {
+            props.onSubmit({
+                text: textRef.value
+            });
+        };
+
+         return (
+            <div>
+                <div className="form-group">
+                    <label>New Project:</label>&nbsp;
+                    <input className="form-control"
+                           type="text"
+                           ref={el => textRef = el}
+                           placeholder="Project Name"/>
+                    &nbsp;
+                </div>
+                <button className="btn btn-primary" onClick={onSubmit}>+</button>
+            </div>
+        );
+    }
+}
+
+AddProject.propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+    onProjectCreate: Proptypes.func.isRequired,
+    onProjectDelete: Proptypes.func.isRequired
+};
+
+
+export class AddTaskForm extends PureComponent {
     render() {
         const props = this.props;
         let textRef;
@@ -127,7 +163,7 @@ export class AddTodoForm extends PureComponent {
                     <input className="form-control"
                            type="text"
                            ref={el => textRef = el}
-                           placeholder="Todo Name"/>
+                           placeholder="Task Name"/>
                     &nbsp;
                 </div>
                 <div className="form-group">
@@ -138,17 +174,17 @@ export class AddTodoForm extends PureComponent {
                            placeholder="urgent, personal, work"/>
                     &nbsp;
                 </div>
-                <button className="btn btn-primary" onClick={onSubmit}>Add Todo</button>
+                <button className="btn btn-primary" onClick={onSubmit}>Add Task</button>
             </div>
         );
     }
 }
 
-AddTodoForm.propTypes = {
+AddTaskForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
 };
 
-export class UserSelector extends PureComponent {
+export class ProjectSelector extends PureComponent {
     render() {
         const props = this.props;
         let selectRef;
@@ -160,7 +196,7 @@ export class UserSelector extends PureComponent {
 
         return (
             <div className="form-group">
-                <label>User</label>
+                <label>Project</label>
                 <select className="form-control"
                         onChange={onChange}
                         ref={el => selectRef = el}>
@@ -171,7 +207,7 @@ export class UserSelector extends PureComponent {
     }
 }
 
-UserSelector.propTypes = {
+ProjectSelector.propTypes = {
     onSelect: PropTypes.func.isRequired,
     children: PropTypes.arrayOf(PropTypes.element).isRequired,
 };

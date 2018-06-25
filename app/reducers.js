@@ -1,9 +1,9 @@
-import { SELECT_USER } from './actionTypes';
+import { SELECT_PROJECT } from './actionTypes';
 
-export function selectedUserIdReducer(state = 0, action) {
+export function selectedProjectIdReducer(state = 0, action) {
     const { type, payload } = action;
     switch (type) {
-    case SELECT_USER:
+    case SELECT_PROJECT:
         return payload;
     default:
         return state;

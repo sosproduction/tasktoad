@@ -6,55 +6,55 @@ export const ormSelector = state => state.orm;
 
 // Redux-ORM selectors work with reselect. To feed input
 // selectors to a Redux-ORM selector, we use the reselect `createSelector`.
-export const todos = createSelector(
+export const tasks = createSelector(
     // The first input selector should always be the orm selector.
     // Behind the scenes, `schema.createSelector` begins a Redux-ORM
     // session with the state selected by `ormSelector` and passes
     // that Session instance as an argument instead.
     // So, `orm` is a Session instance.
     ormSelector,
-    state => state.selectedUserId,
-    schema.createSelector((orm, userId) => {
-        console.log('Running todos selector');
+    state => state.selectedProjectId,
+    schema.createSelector((orm, projectId) => {
+        console.log('Running tasks selector');
 
-        // We could also do orm.User.withId(userId).todos.map(...)
-        // but this saves a query on the User table.
+        // We could also do orm.Project.withId(projectId).tasks.map(...)
+        // but this saves a query on the Project table.
         //
         // `.withRefs` means that the next operation (in this case filter)
         // will use direct references from the state instead of Model instances.
         // If you don't need any Model instance methods, you should use withRefs.
-        return orm.Todo.withRefs.filter({ user: userId }).map(todo => {
-            // `todo.ref` is a direct reference to the state,
+        return orm.Task.withRefs.filter({ project: projectId }).map(task => {
+            // `task.ref` is a direct reference to the state,
             // so we need to be careful not to mutate it.
             //
             // We want to add a denormalized `tags` attribute
-            // to each of our todos, so we make a shallow copy of `todo.ref`.
-            const obj = Object.assign({}, todo.ref);
-            obj.tags = todo.tags.withRefs.map(tag => tag.name);
+            // to each of our tasks, so we make a shallow copy of `task.ref`.
+            const obj = Object.assign({}, task.ref);
+            obj.tags = task.tags.withRefs.map(tag => tag.name);
 
             return obj;
         });
     })
 );
 
-export const user = createSelector(
+export const project = createSelector(
     ormSelector,
-    state => state.selectedUserId,
-    schema.createSelector((orm, selectedUserId) => {
-        console.log('Running user selector');
+    state => state.selectedProjectId,
+    schema.createSelector((orm, selectedProjectId) => {
+        console.log('Running project selector');
         // .ref returns a reference to the plain
         // JavaScript object in the store.
-        return orm.User.withId(selectedUserId).ref;
+        return orm.Project.withId(selectedProjectId).ref;
     })
 );
 
-export const users = createSelector(
+export const projects = createSelector(
     ormSelector,
     schema.createSelector(orm => {
-        console.log('Running users selector');
+        console.log('Running projects selector');
 
         // `.toRefArray` returns a new Array that includes
-        // direct references to each User object in the state.
-        return orm.User.all().toRefArray();
+        // direct references to each Project object in the state.
+        return orm.Project.all().toRefArray();
     })
 );

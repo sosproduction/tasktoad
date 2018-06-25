@@ -1,11 +1,11 @@
 /* eslint no-unused-expressions: 0 */
 import { expect } from 'chai';
 import {
-    CREATE_TODO,
+    CREATE_TASK,
     MARK_DONE,
-    DELETE_TODO,
-    ADD_TAG_TO_TODO,
-    REMOVE_TAG_FROM_TODO,
+    DELETE_TASK,
+    ADD_TAG_TO_TASK,
+    REMOVE_TAG_FROM_TASK,
 } from '../actionTypes';
 import { schema } from '../models';
 import factory from './factories';
@@ -26,12 +26,12 @@ describe('Models', () => {
 
         factory.setAdapter(new ReduxORMAdapter(session));
 
-        factory.createMany('User', 2).then(users => {
-            return Promise.all(users.map(user => {
-                const userId = user.getId();
+        factory.createMany('Project', 2).then(projects => {
+            return Promise.all(projects.map(project => {
+                const projectId = project.getId();
 
-                // Create 10 todos for both of our 2 users.
-                return factory.createMany('Todo', { user: userId }, 10);
+                // Create 10 tasks for both of our 2 projects.
+                return factory.createMany('Task', { project: projectId }, 10);
             }));
         }).then(() => {
             // Generating data is finished, start up a session.
@@ -42,23 +42,23 @@ describe('Models', () => {
         });
     });
 
-    it('correctly handle CREATE_TODO', () => {
-        const todoText = 'New Todo Text!';
-        const todoTags = 'testing, nice, cool';
-        const user = session.User.first();
-        const userId = user.getId();
+    it('correctly handle CREATE_TASK', () => {
+        const taskText = 'New Task Text!';
+        const taskTags = 'testing, nice, cool';
+        const project = session.Project.first();
+        const projectId = project.getId();
 
         const action = {
-            type: CREATE_TODO,
+            type: CREATE_TASK,
             payload: {
-                text: todoText,
-                tags: todoTags,
-                user: userId,
+                text: taskText,
+                tags: taskTags,
+                project: projectId,
             },
         };
 
-        expect(user.todos.count()).to.equal(10);
-        expect(session.Todo.count()).to.equal(20);
+        expect(project.tasks.count()).to.equal(10);
+        expect(session.Task.count()).to.equal(20);
         expect(session.Tag.count()).to.equal(80);
 
         // The below helper function completes an action dispatch
@@ -67,101 +67,101 @@ describe('Models', () => {
         // next state yielded from the dispatch loop.
         // With this new Session, we can query the resulting state.
         const {
-            Todo,
+            Task,
             Tag,
-            User,
+            Project,
         } = applyActionAndGetNextSession(schema, state, action);
 
-        expect(User.withId(userId).todos.count()).to.equal(11);
-        expect(Todo.count()).to.equal(21);
+        expect(Project.withId(projectId).tasks.count()).to.equal(11);
+        expect(Task.count()).to.equal(21);
         expect(Tag.count()).to.equal(83);
 
-        const newTodo = Todo.last();
+        const newTask = Task.last();
 
-        expect(newTodo.text).to.equal(todoText);
-        expect(newTodo.user.getId()).to.equal(userId);
-        expect(newTodo.done).to.be.false;
-        expect(newTodo.tags.map(tag => tag.name)).to.deep.equal(['testing', 'nice', 'cool']);
+        expect(newTask.text).to.equal(taskText);
+        expect(newTask.project.getId()).to.equal(projectId);
+        expect(newTask.done).to.be.false;
+        expect(newTask.tags.map(tag => tag.name)).to.deep.equal(['testing', 'nice', 'cool']);
     });
 
     it('correctly handle MARK_DONE', () => {
-        const todo = session.Todo.filter({ done: false }).first();
-        const todoId = todo.getId();
+        const task = session.Task.filter({ done: false }).first();
+        const taskId = task.getId();
 
         const action = {
             type: MARK_DONE,
-            payload: todoId,
+            payload: taskId,
         };
 
-        expect(todo.done).to.be.false;
+        expect(task.done).to.be.false;
 
-        const { Todo } = applyActionAndGetNextSession(schema, state, action);
+        const { Task } = applyActionAndGetNextSession(schema, state, action);
 
-        expect(Todo.withId(todoId).done).to.be.true;
+        expect(Task.withId(taskId).done).to.be.true;
     });
 
-    it('correctly handle DELETE_TODO', () => {
-        const todo = session.Todo.first();
-        const todoId = todo.getId();
+    it('correctly handle DELETE_TASK', () => {
+        const task = session.Task.first();
+        const taskId = task.getId();
 
         const action = {
-            type: DELETE_TODO,
-            payload: todoId,
+            type: DELETE_TASK,
+            payload: taskId,
         };
 
-        expect(session.Todo.count()).to.equal(20);
+        expect(session.Task.count()).to.equal(20);
 
-        const { Todo } = applyActionAndGetNextSession(schema, state, action);
+        const { Task } = applyActionAndGetNextSession(schema, state, action);
 
-        expect(Todo.count()).to.equal(19);
-        expect(() => Todo.withId(todoId)).to.throw(Error);
+        expect(Task.count()).to.equal(19);
+        expect(() => Task.withId(taskId)).to.throw(Error);
     });
 
-    it('correctly handle ADD_TAG_TO_TODO', () => {
-        const todo = session.Todo.first();
-        const todoId = todo.getId();
+    it('correctly handle ADD_TAG_TO_TASK', () => {
+        const task = session.Task.first();
+        const taskId = task.getId();
 
         const newTagName = 'coolnewtag';
 
         const action = {
-            type: ADD_TAG_TO_TODO,
+            type: ADD_TAG_TO_TASK,
             payload: {
-                todo: todoId,
+                task: taskId,
                 tag: newTagName,
             },
         };
 
         expect(session.Tag.count()).to.equal(80);
 
-        const { Todo, Tag } = applyActionAndGetNextSession(schema, state, action);
+        const { Task, Tag } = applyActionAndGetNextSession(schema, state, action);
 
         expect(Tag.count()).to.equal(81);
         expect(Tag.last().name).to.equal(newTagName);
 
-        expect(Todo.withId(todoId).tags.withRefs.map(tag => tag.name)).to.include(newTagName);
+        expect(Task.withId(taskId).tags.withRefs.map(tag => tag.name)).to.include(newTagName);
     });
 
-    it('correctly handles REMOVE_TAG_FROM_TODO', () => {
-        const todo = session.Todo.first();
-        const todoId = todo.getId();
+    it('correctly handles REMOVE_TAG_FROM_TASK', () => {
+        const task = session.Task.first();
+        const taskId = task.getId();
 
-        const removeTagId = todo.tags.first().getId();
+        const removeTagId = task.tags.first().getId();
 
         const action = {
-            type: REMOVE_TAG_FROM_TODO,
+            type: REMOVE_TAG_FROM_TASK,
             payload: {
-                todo: todoId,
+                task: taskId,
                 tag: removeTagId,
             },
         };
 
         expect(session.Tag.count()).to.equal(80);
 
-        const { Todo, Tag } = applyActionAndGetNextSession(schema, state, action);
+        const { Task, Tag } = applyActionAndGetNextSession(schema, state, action);
 
         // Tag count should remain the same.
         expect(Tag.count()).to.equal(80);
 
-        expect(Todo.withId(todoId).tags.withRefs.map(tag => tag.name)).to.not.include(removeTagId);
+        expect(Task.withId(taskId).tags.withRefs.map(tag => tag.name)).to.not.include(removeTagId);
     });
 });
